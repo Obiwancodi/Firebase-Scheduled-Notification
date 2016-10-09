@@ -20,7 +20,9 @@ router.post('/', function (req,res,next) {
 		};
 		res.send(response);
 	})
-	.catch(err);
+	.catch(function(err) {
+		console.log(err)
+	});
 });
 
 
