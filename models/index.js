@@ -29,19 +29,6 @@ const Messages = db.define('messages', {
 		type: Sequelize.BOOLEAN,
 		defaultValue: false
 	}
-},
-{
-	getterMethods : {
-		changeFormat : function() {
-				 const obj =  {
-			      body : this.content,
-			      title : this.title,
-			      icon : this.icon
-			    
-			  	};
-			return obj
-		}	
-	}
 });
 
 module.exports = {

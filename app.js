@@ -10,8 +10,7 @@ const gcm = require('node-gcm');
 
 const app = express();
 
-
-const sender = new gcm.Sender('YOUR_API_KEY_HERE');
+const sender = new gcm.Sender('AIzaSyAzuutimSryG3GRkDWRJqArRr2NJbbY-M0');
 const job = new CronJob('*/10 * * * * *', function() {
 	  let messageArray = [];
   	Message.findAll({
@@ -28,7 +27,6 @@ const job = new CronJob('*/10 * * * * *', function() {
   		pendingMessages.forEach(message => {
           
           regTokens = [message.dataValues.token];
-          message= message.changeFormat;
           
           let note = new gcm.Message({
             notification: {
@@ -43,8 +41,6 @@ const job = new CronJob('*/10 * * * * *', function() {
   		})
 
       messageArray.forEach(message => {
-        
-        let note = JSON.stringify(message.params.notification);
            
         sender.send(message, { registrationTokens: regTokens }, function (err, response) {
             if(err) console.error(err);
