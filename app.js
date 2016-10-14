@@ -14,7 +14,8 @@ const sender = new gcm.Sender('AIzaSyAzuutimSryG3GRkDWRJqArRr2NJbbY-M0');
 
 let regTokens;
 
-const queryAndReformat = function(array,regTokens) {
+const queryAndReformat = function() {
+  let array = []
     Message.findAll({
       where : {
         time : {
@@ -36,21 +37,52 @@ const queryAndReformat = function(array,regTokens) {
               body: message.body
               }
           });
-          console.log("this is a note")
+          console.log("this is a note",note)
           array.push(note);
           
       })
-     return note
+      console.log("ARRAY", array)
+     
     })
+    return array
 }    
 
-let messageArray = [];
-
+let messageArray = []
 const job = new CronJob('*/10 * * * * *', function() {
       
-      messageArray =  queryAndReformat(messageArray,regTokens);
-       console.log("IS THIS OUT OF SYNC",messageArray)
-	     
+       const queryAndReformat = function() {
+         let array = []
+           Message.findAll({
+             where : {
+               time : {
+                 $lte: new Date()
+               },
+               sent:false
+             }
+           })
+           .then(pendingMessages => {
+             
+             pendingMessages.forEach(message => {
+                 
+                 regTokens = [message.dataValues.token];
+                 message= message.changeFormat;
+                 let note = new gcm.Message({
+                   notification: {
+                     title: message.title,
+                     icon: message.icon,
+                     body: message.body
+                     }
+                 });
+                 console.log("this is a note",note)
+                 array.push(note);
+                 
+             })
+             console.log("ARRAY", array)
+            return array
+           })
+       }   
+       
+	    messageArray = queryAndReformat(regTokens);
       messageArray.forEach(message => {
         sender.send(message, { registrationTokens: regTokens }, function (err, response) {
             if(err) console.error(err);
