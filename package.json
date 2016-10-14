@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha ./test --watch"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +18,9 @@
     "https": "^1.0.0",
     "node-gcm": "^0.14.4",
     "pg": "^6.1.0",
-    "sequelize": "^3.24.0"
+    "sequelize": "^3.24.0",
+    "mocha": "^2.2.4",
+    "supertest": "^0.15.0",
+    "chai": "^2.2.0"
   }
 }
