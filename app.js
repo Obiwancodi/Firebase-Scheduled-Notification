@@ -11,23 +11,24 @@ const gcm = require('node-gcm');
 const app = express();
 
 const sender = new gcm.Sender('AIzaSyAzuutimSryG3GRkDWRJqArRr2NJbbY-M0');
-const job = new CronJob('*/10 * * * * *', function() {
-	  let messageArray = [];
-  	Message.findAll({
-  		where : {
-  			time : {
-  				$lte: new Date()
-  			},
-        sent:false
-  		}
-  	})
 
-  	.then(pendingMessages => {
-      let regTokens;
-  		pendingMessages.forEach(message => {
+let regTokens;
+
+const queryAndReformat = function(array,regTokens) {
+    Message.findAll({
+      where : {
+        time : {
+          $lte: new Date()
+        },
+        sent:false
+      }
+    })
+    .then(pendingMessages => {
+      
+      pendingMessages.forEach(message => {
           
           regTokens = [message.dataValues.token];
-          
+          message= message.changeFormat;
           let note = new gcm.Message({
             notification: {
               title: message.title,
@@ -35,17 +36,27 @@ const job = new CronJob('*/10 * * * * *', function() {
               body: message.body
               }
           });
-
-          messageArray.push(note);
+          console.log("this is a note")
+          array.push(note);
           
-  		})
+      })
+     return note
+    })
+}    
 
+let messageArray = [];
+
+const job = new CronJob('*/10 * * * * *', function() {
+      
+      messageArray =  queryAndReformat(messageArray,regTokens);
+       console.log("IS THIS OUT OF SYNC",messageArray)
+	     
       messageArray.forEach(message => {
-           
         sender.send(message, { registrationTokens: regTokens }, function (err, response) {
             if(err) console.error(err);
             else  console.log("Response",response);
         });
+        messageArray = []
         Message.update ({
           sent:true,
           },
@@ -59,7 +70,6 @@ const job = new CronJob('*/10 * * * * *', function() {
         )
       });
   		
-  	});
   }, function () {
     
   },
@@ -83,3 +93,7 @@ app.use(function(err, req, res, next) {
 });
 
 
+module.exports = {
+  app: app,
+  queryAndReformat : queryAndReformat
+};

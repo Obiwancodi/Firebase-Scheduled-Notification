@@ -18,6 +18,7 @@ router.post('/', function (req,res,next) {
 			message: message,
 			log: "Message saved"
 		};
+		console.log("hello?")
 		res.send(response);
 	})
 	.catch(function(err) {
