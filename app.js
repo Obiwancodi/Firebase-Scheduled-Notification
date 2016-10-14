@@ -11,45 +11,52 @@ const gcm = require('node-gcm');
 const app = express();
 
 let messageArray = [];
+let regTokens;
+const queryAndFormat = function() {
+      Message.findAll({
+      where : {
+        time : {
+          $lte: new Date()
+        },
+        sent:false
+      }
+    })
+
+     .then(pendingMessages => {
+      
+      pendingMessages.forEach(message => {
+        
+        regTokens = [message.dataValues.token];
+        message= message.changeFormat;
+          
+        let note = new gcm.Message({
+          notification: {
+            title: message.title,
+            icon: message.icon,
+            body: message.body
+            }
+        });
+
+        messageArray.push(note);
+        console.log("hello",messageArray)
+      });
+    
+  });
+};
+
+
 const sender = new gcm.Sender('AIzaSyAzuutimSryG3GRkDWRJqArRr2NJbbY-M0');
 const job = new CronJob('*/10 * * * * *', function() {
-	
-  	Message.findAll({
-  		where : {
-  			time : {
-  				$lte: new Date()
-  			},
-        sent:false
-  		}
-  	})
-
-  	.then(pendingMessages => {
-      let regTokens;
-  		pendingMessages.forEach(message => {
-        
-          regTokens = [message.dataValues.token];
-          message= message.changeFormat;
-          
-          let note = new gcm.Message({
-            notification: {
-              title: message.title,
-              icon: message.icon,
-              body: message.body
-              }
-          })
-
-          messageArray.push(note);
-          
-  		})
-
+	    queryAndFormat();
       messageArray.forEach(message => {
-           
+           console.log(message)
         let note = JSON.stringify(message.params.notification);
            
         sender.send(message, { registrationTokens: regTokens }, function (err, response) {
             if(err) console.error(err);
             else  console.log("Response",response);
         });
+        messageArray = []
         Message.update ({
           sent:true,
           },
@@ -63,15 +70,10 @@ const job = new CronJob('*/10 * * * * *', function() {
         )
       });
       
-
-  		
-  		
-  	});
   }, function () {
     
-  },
+  }, 
   true 
-  
 );
 
 models.db.sync({})
@@ -90,4 +92,7 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+module.exports =  {
+  app: app,
+  queryAndFormat: queryAndFormat
+};
