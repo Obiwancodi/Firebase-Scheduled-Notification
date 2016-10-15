@@ -4,7 +4,6 @@ const models = require('../models');
 const gcm = require('node-gcm');
 const Message = models.Messages;
 
-
 const queryAndFormat = function() {
     let messageInfo = {}
     return  Message.findAll({
@@ -34,6 +33,21 @@ const queryAndFormat = function() {
     }); 
 };
 
+const updateSentMessages = function() {
+    Message.update ({
+        sent:true,
+        },
+        {
+          where: {
+            time : {
+              $lte: new Date()
+            },
+          }
+        }
+      );
+};
+
 module.exports ={
-  queryAndFormat : queryAndFormat
+  queryAndFormat : queryAndFormat,
+  updateSentMessages : updateSentMessages 
 }; 

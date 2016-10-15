@@ -1,12 +1,14 @@
 const theApp = require('../app');
-	queryAndFormat = theApp.queryAndFormat
 const Promise = require('bluebird');
-const models = require('../models'),
-	Message = models.Messages,
-	db = models.db;
 const expect = require('chai').expect;
 const supertest = require('supertest');
 const agent = supertest.agent(theApp.app);
+const meessageFnc = require('../messageFunctions')
+const queryAndFormat = meessageFnc.queryAndFormat
+const models = require('../models'),
+	Message = models.Messages,
+	db = models.db;
+const gcm = require('node-gcm');
 
 describe('Firebase Scheduled Notifications', function () {
 
@@ -62,6 +64,7 @@ describe('Firebase Scheduled Notifications', function () {
 
 		let messageShouldBeQuery;
 		let messageShouldNotBeQuery;
+		let formatMessage;
 
 		beforeEach(function () {
 			return Message.create({
@@ -73,6 +76,13 @@ describe('Firebase Scheduled Notifications', function () {
 			})
 			.then(message => {
 			   messageShouldBeQuery = message;
+			   formatMessage = new gcm.Message({
+			       notification: {
+			       title: message.title,
+			       icon: message.icon,
+			       body: message.content
+			       }
+			   });
 			});
 		});
 
@@ -89,23 +99,34 @@ describe('Firebase Scheduled Notifications', function () {
 			});
 		});
 
-		
-		let regTokens;
-		 let messageArray =[];
+		it('should only query messages that have not been sent', function(done) {
+			queryAndFormat()
+			.then(messageArray => {
+				expect(messageArray.length).to.equal(1)
+				done();
+			})
+		});
 
 		it('should push a new message token into regTokens', function(done){
 			queryAndFormat()
-			.then(value => {
-				messageArray.push(value)
+			.then(messageArray => {
+				expect(messageArray[0]['regTokens']).to.eql([messageShouldBeQuery.token]);	
+				done();	
 			})
+			.catch(done);
+		});
 
-			 
-			expect(messageArray[0]).to.equal('dshA77uf3WA:APA91bGiNKIEQrfplRwp6aG7RbSj9zIGuh5LG9S-4DG8Atq7ezslwRUV0B8izwbyl6Ls_tYrk2aepg46Eyh9R-h2vQgX_AOVaOgGhOlnXtRhwIuX76uBKnxWShTHlw80UT2UGp5SV7BN');
-			done();
-		})
-		
-	});
-	
+		it('should return correctly formated message for FCM', function(done) {
+			queryAndFormat()
+			.then(messageArray => {
+				console.log(messageArray[0]['note'])
+				
+				expect(messageArray[0]['note']).to.eql(formatMessage);
+				done();
+			})
+			.catch(done)
+		});
+	});	
 
 });
 
