@@ -58,8 +58,10 @@ describe('Firebase Scheduled Notifications', function () {
 
 
 
-	describe('queryAndReformat', function() {
+	describe('queryAndFormat', function() {
 
+		let messageShouldBeQuery;
+		let messageShouldNotBeQuery;
 
 		beforeEach(function () {
 			return Message.create({
@@ -87,15 +89,18 @@ describe('Firebase Scheduled Notifications', function () {
 			});
 		});
 
-		let messageShouldBeQuery;
-		let messageShouldNotBeQuery;
+		
 		let regTokens;
-		let messageArray =[];
+		 let messageArray =[];
 
 		it('should push a new message token into regTokens', function(done){
 			queryAndFormat()
-			console.log(messageArray)
-			expect(messageArray[1]).to.equal('dshA77uf3WA:APA91bGiNKIEQrfplRwp6aG7RbSj9zIGuh5LG9S-4DG8Atq7ezslwRUV0B8izwbyl6Ls_tYrk2aepg46Eyh9R-h2vQgX_AOVaOgGhOlnXtRhwIuX76uBKnxWShTHlw80UT2UGp5SV7BN');
+			.then(value => {
+				messageArray.push(value)
+			})
+
+			 
+			expect(messageArray[0]).to.equal('dshA77uf3WA:APA91bGiNKIEQrfplRwp6aG7RbSj9zIGuh5LG9S-4DG8Atq7ezslwRUV0B8izwbyl6Ls_tYrk2aepg46Eyh9R-h2vQgX_AOVaOgGhOlnXtRhwIuX76uBKnxWShTHlw80UT2UGp5SV7BN');
 			done();
 		})
 		
