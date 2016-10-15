@@ -10,8 +10,9 @@ const gcm = require('node-gcm');
 
 const app = express();
 
-let regTokens;
+
 const queryAndFormat = function() {
+    let messageInfo = {}
     return  Message.findAll({
       where : {
         time : {
@@ -20,14 +21,13 @@ const queryAndFormat = function() {
         sent:false
       }
     })
-
      .then(pendingMessages => {
       
       let array = pendingMessages.map(message => {
         
-        regTokens = [message.dataValues.token];
-         message= message.changeFormat;
-        let note = new gcm.Message({
+        messageInfo['regTokens'] = [message.dataValues.token];
+        message = message.changeFormat;
+        messageInfo['note'] = new gcm.Message({
           notification: {
             title: message.title,
             icon: message.icon,
@@ -35,7 +35,7 @@ const queryAndFormat = function() {
             }
         });
         
-        return note
+        return messageInfo
       });
      
       return array
@@ -49,9 +49,8 @@ const sender = new gcm.Sender('AIzaSyAzuutimSryG3GRkDWRJqArRr2NJbbY-M0');
 const job = new CronJob('*/10 * * * * *', function() {
 	    queryAndFormat()
       .then(messageArray => {
-          messageArray.forEach(message => {
-            console.log(regTokens)
-            sender.send(message, { registrationTokens: regTokens }, function (err, response) {
+          messageArray.forEach(messageInfo => {
+            sender.send(messageInfo['note'], { registrationTokens: messageInfo['regTokens'] }, function (err, response) {
                 if(err) console.error(err);
                 else  console.log("Response",response);  
         
