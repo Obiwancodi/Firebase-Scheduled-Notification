@@ -26,6 +26,7 @@ const queryAndFormat = function() {
       let array = pendingMessages.map(message => {
         
         regTokens = [message.dataValues.token];
+         message= message.changeFormat;
         let note = new gcm.Message({
           notification: {
             title: message.title,
@@ -39,7 +40,7 @@ const queryAndFormat = function() {
      
       return array
        
-  })
+  });
    
 };
 
@@ -49,16 +50,14 @@ const job = new CronJob('*/10 * * * * *', function() {
 	    queryAndFormat()
       .then(messageArray => {
           messageArray.forEach(message => {
-            console.log(message)
+            console.log(regTokens)
             sender.send(message, { registrationTokens: regTokens }, function (err, response) {
                 if(err) console.error(err);
-                else  console.log("Response",response);
-            ;  
+                else  console.log("Response",response);  
         
-        })
+            });
         
-      })
-        messageArray = []
+          });
         Message.update ({
           sent:true,
           },
@@ -69,7 +68,7 @@ const job = new CronJob('*/10 * * * * *', function() {
               },
             }
           }
-        )
+        );
       });
       
   }, function () {
