@@ -20,7 +20,7 @@ The Android device token, title of the notification, the notification body, and 
 
 http://loopj.com/android-async-http/
 
-The server receives the JSON data and stores the data in a Sequelize database.  Every ten seconds the database is queried and gathers the unsent messages whose scheduled time has been reached. The messages are formatted into FCM format and sent to the correct Android device.  Firebase Messaging Service on the Android device processes the notification information and sends the notification to the device.
+The server receives the JSON data and stores the data in a Sequelize database.  Every ten seconds the database is queried and gathers the unsent messages whose scheduled time has been reached. The messages are formatted into FCM format and sent to the correct Android device.  Firebase Messaging Service class on the Android device processes the notification information and sends the notification to the device.
 
 https://github.com/firebase/quickstart-android/blob/master/messaging/app/src/main/java/com/google/firebase/quickstart/fcm/MyFirebaseMessagingService.java
 
