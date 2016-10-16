@@ -16,7 +16,7 @@ npm test
 
 **How it works**
 
-The Android device token, title of the notification, the notification body, and the time the notification is to be received is sent to the server from the Android device in JSON format.  I used an Android async http library to send the JSON data to the server. 
+The Android device token, title of the notification, the notification body, and the time the notification is to be received by the user is sent to the server from the Android device in JSON format.  I used an Android async http library to send the JSON data to the server. 
 
 http://loopj.com/android-async-http/
 
