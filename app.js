@@ -7,106 +7,32 @@ const routes = require('./routes');
 const models = require('./models');
 const Message = models.Messages;
 const gcm = require('node-gcm');
+const messageFnc = require('./messageFunctions')
+const queryAndFormat = messageFnc.queryAndFormat;
+const updateSentMessages = messageFnc.updateSentMessages;
 
 const app = express();
 
 const sender = new gcm.Sender('AIzaSyAzuutimSryG3GRkDWRJqArRr2NJbbY-M0');
 
-let regTokens;
-
-const queryAndReformat = function() {
-  let array = []
-    Message.findAll({
-      where : {
-        time : {
-          $lte: new Date()
-        },
-        sent:false
-      }
-    })
-    .then(pendingMessages => {
-      
-      pendingMessages.forEach(message => {
-          
-          regTokens = [message.dataValues.token];
-          message= message.changeFormat;
-          let note = new gcm.Message({
-            notification: {
-              title: message.title,
-              icon: message.icon,
-              body: message.body
-              }
-          });
-          console.log("this is a note",note)
-          array.push(note);
-          
-      })
-      console.log("ARRAY", array)
-     
-    })
-    return array
-}    
-
-let messageArray = []
 const job = new CronJob('*/10 * * * * *', function() {
-      
-       const queryAndReformat = function() {
-         let array = []
-           Message.findAll({
-             where : {
-               time : {
-                 $lte: new Date()
-               },
-               sent:false
-             }
-           })
-           .then(pendingMessages => {
-             
-             pendingMessages.forEach(message => {
-                 
-                 regTokens = [message.dataValues.token];
-                 message= message.changeFormat;
-                 let note = new gcm.Message({
-                   notification: {
-                     title: message.title,
-                     icon: message.icon,
-                     body: message.body
-                     }
-                 });
-                 console.log("this is a note",note)
-                 array.push(note);
-                 
-             })
-             console.log("ARRAY", array)
-            return array
-           })
-       }   
-       
-	    messageArray = queryAndReformat(regTokens);
-      messageArray.forEach(message => {
-        sender.send(message, { registrationTokens: regTokens }, function (err, response) {
+    queryAndFormat()
+    .then(messageArray => {
+        messageArray.forEach(messageInfo => {
+            sender.send(messageInfo['note'], { registrationTokens: messageInfo['regTokens'] }, function (err, response) {
             if(err) console.error(err);
-            else  console.log("Response",response);
+            else  console.log("Response",response);  
+        
+            });
+        
         });
-        messageArray = []
-        Message.update ({
-          sent:true,
-          },
-          {
-            where: {
-              time : {
-                $lte: new Date()
-              },
-            }
-          }
-        )
-      });
-  		
-  }, function () {
+
+        updateSentMessages();
+    }) }, function () {
+
     
-  },
+  }, 
   true 
-  
 );
 
 models.db.sync({})
@@ -115,17 +41,15 @@ models.db.sync({})
   });
 });
 
-
 app.use(bodyParser.json());
 app.use('/', routes);
 
 app.use(function(err, req, res, next) {
   res.status(404);
-  res.status(500).send(err);
+  res.status(500)
 });
 
-
-module.exports = {
+module.exports =  {
   app: app,
-  queryAndReformat : queryAndReformat
 };
+

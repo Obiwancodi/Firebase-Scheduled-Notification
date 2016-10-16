@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha --reporter spec tests/test.js"
+    "start": "nodemon --watch server -e js,html app.js",
+    "test": "mocha ./test --watch"
   },
   "keywords": [],
   "author": "",
@@ -19,8 +20,10 @@
     "https": "^1.0.0",
     "mocha": "^3.1.0",
     "node-gcm": "^0.14.4",
+    "nodemon": "^1.11.0",
     "pg": "^6.1.0",
     "sequelize": "^3.24.0",
     "supertest": "^2.0.0"
+
   }
 }
