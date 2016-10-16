@@ -42,7 +42,7 @@ app.use('/', routes);
 
 app.use(function(err, req, res, next) {
   res.status(404);
-  res.status(500)
+  res.status(500);
 });
 
 module.exports =  {

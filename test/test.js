@@ -119,8 +119,6 @@ describe('Firebase Scheduled Notifications', function () {
 		it('should return correctly formated message for FCM', function(done) {
 			queryAndFormat()
 			.then(messageArray => {
-				console.log(messageArray[0]['note'])
-				
 				expect(messageArray[0]['note']).to.eql(formatMessage);
 				done();
 			})
