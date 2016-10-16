@@ -1,6 +1,6 @@
 # Firebase-Scheduled-Notification SDK Add On For Android 
  
-As of today, Firebase does not does not provide scheduled notifications for Android via its SDK. This project seeks to solve that problem.
+As of today, Firebase does not provide scheduled notifications for Android via its SDK. This project seeks to solve that problem.
 
 **Installation** 
 
