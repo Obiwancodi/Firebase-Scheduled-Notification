@@ -13,7 +13,7 @@ const updateSentMessages = messageFnc.updateSentMessages;
 
 const app = express();
 
-const sender = new gcm.Sender('AIzaSyAzuutimSryG3GRkDWRJqArRr2NJbbY-M0');
+const sender = new gcm.Sender('YOUR_API_KEY_HERE');
 
 const job = new CronJob('*/10 * * * * *', function() {
     queryAndFormat()
@@ -22,16 +22,12 @@ const job = new CronJob('*/10 * * * * *', function() {
             sender.send(messageInfo['note'], { registrationTokens: messageInfo['regTokens'] }, function (err, response) {
             if(err) console.error(err);
             else  console.log("Response",response);  
-        
             });
-        
         });
-
         updateSentMessages();
-    }) }, function () {
-
-    
-  }, 
+    }) 
+  }, function () {   
+      }, 
   true 
 );
 

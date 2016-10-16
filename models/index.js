@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const db = new Sequelize('postgres://localhost:5432/timefulCron');
+const db = new Sequelize('YOUR_DATABASE_URI');
 db.logging = false;
 
 const Messages = db.define('messages', {
