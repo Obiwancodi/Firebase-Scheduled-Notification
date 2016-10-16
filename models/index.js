@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const db = new Sequelize('YOUR_DATABASE_URI');
+const db = new Sequelize('YOUR_DATABASE_URI_HERE');
 db.logging = false;
 
 const Messages = db.define('messages', {
